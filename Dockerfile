@@ -25,7 +25,6 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
 	pkg-config
 RUN pip3 install scipy-*.whl
 RUN pip3 wheel --no-deps h5py==2.10.0
-RUN pip3 wheel cython==0.29.14
 
 
 FROM base

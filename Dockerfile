@@ -1,4 +1,5 @@
-FROM debian:stretch AS base
+# debian:stretch-20200130
+FROM debian@sha256:872b72a2b8487e4b91ae27855c7de1671635d3dc2cc0b89651103e55c74ed34a AS base
 
 FROM base as build
 RUN apt-get update && apt-get -y install --no-install-recommends \
@@ -18,18 +19,22 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
 RUN pip3 install wheel==0.34.2 cython==0.29.14 pybind11==2.4.3
 RUN pip3 wheel numpy==1.18.1 && pip3 install numpy-*.whl
 RUN pip3 wheel scipy==1.4.1
-
-
-# FROM python:3.5.9-slim-stretch
-# RUN apt-get update && apt-get -y install --no-install-recommends \
-# 	wget
-# COPY --from=build /numpy-*.whl /scipy-*.whl /
-RUN pip3 install numpy-*.whl scipy-*.whl
-# RUN pip install --no-deps keras_applications keras_preprocessing
 RUN apt-get update && apt-get -y install --no-install-recommends \
 	libhdf5-dev \
 	libhdf5-100 \
 	pkg-config
-# ln -s /usr/lib/arm-linux-gnueabihf/hdf5/serial/libhdf5.so /usr/lib/arm-linux-gnueabihf/libhdf5.so
+RUN pip3 install scipy-*.whl
+RUN pip3 wheel --no-deps h5py==2.10.0
+RUN pip3 wheel cython==0.29.14
+
+
+FROM base
+RUN apt-get update && apt-get -y install --no-install-recommends \
+	python3-pip \
+	python3-setuptools \
+	libopenblas-base \
+	wget
+COPY --from=build /*.whl /
+RUN pip3 install *.whl
 RUN wget https://storage.googleapis.com/tensorflow/raspberrypi/tensorflow-2.1.0-cp35-none-linux_armv7l.whl
-# RUN pip3 install tensorflow-*.whl
+RUN pip3 install tensorflow-*.whl

@@ -10,6 +10,9 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
 	libblas-dev \
 	liblapack-dev \
 	libatlas-base-dev \
+	libhdf5-dev \
+	libhdf5-100 \
+	pkg-config \
 	python3 \
 	python3-dev \
 	python3-pip \
@@ -19,10 +22,6 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
 RUN pip3 install wheel==0.34.2 cython==0.29.14 pybind11==2.4.3
 RUN pip3 wheel numpy==1.18.1 && pip3 install numpy-*.whl
 RUN pip3 wheel scipy==1.4.1
-RUN apt-get update && apt-get -y install --no-install-recommends \
-	libhdf5-dev \
-	libhdf5-100 \
-	pkg-config
 RUN pip3 install scipy-*.whl
 RUN pip3 wheel --no-deps h5py==2.10.0
 

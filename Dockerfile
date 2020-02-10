@@ -30,7 +30,8 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
 	python3-pip \
 	python3-setuptools \
 	libopenblas-base \
-	wget
+	wget \
+&& rm -rf /var/lib/apt/lists/*
 COPY --from=build /*.whl /
 RUN pip3 install *.whl
 RUN wget https://storage.googleapis.com/tensorflow/raspberrypi/tensorflow-2.1.0-cp35-none-linux_armv7l.whl

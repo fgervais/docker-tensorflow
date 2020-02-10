@@ -1,0 +1,47 @@
+FROM francoisgervais/tensorflow:2.1.0-cp35 AS base
+
+ARG OPENCV_VERSION=4.2.0
+FROM base as build
+RUN apt-get update && apt-get -y install --no-install-recommends \
+	build-essential \
+	cmake \
+	gfortran \
+	libjpeg-dev \
+	libatlas-base-dev \
+	libavcodec-dev \
+	libavformat-dev \
+	libgtk2.0-dev \
+	libgtk-3-dev \
+	libswscale-dev \
+	libtiff-dev \
+	libv4l-dev \
+	libx264-dev \
+	libxvidcore-dev \
+	pkg-config \
+	python3-dev \
+	wget
+RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.tar.gz && \
+	tar xf ${OPENCV_VERSION}.tar.gz
+WORKDIR /opencv-${OPENCV_VERSION}/build
+RUN cmake -D CMAKE_BUILD_TYPE=RELEASE \
+	-D CMAKE_INSTALL_PREFIX=_install \
+	-D ENABLE_NEON=ON \
+	-D ENABLE_VFPV3=ON \
+	-D BUILD_TESTS=OFF \
+	-D OPENCV_ENABLE_NONFREE=ON \
+	-D INSTALL_PYTHON_EXAMPLES=OFF \
+	-D BUILD_EXAMPLES=OFF .. && \
+	make -j16
+RUN make install
+
+
+FROM base
+RUN apt-get update && apt-get -y install --no-install-recommends \
+	libatlas3-base \
+	libavcodec57 \
+	libavformat57 \
+	libgtk-3-0 \
+	libswscale4 \
+&& rm -rf /var/lib/apt/lists/*
+COPY --from=build /opencv-${OPENCV_VERSION}/build/_install/ /usr/local/
+RUN ldconfig
